@@ -8,4 +8,5 @@ public interface CafeConstants {
 	public static final String SUCCESS="SUCCESS";
 	public static final String UNAUTHORIZED_ACCESS="UNAUTHORIZED_ACCESS";
 	public static final String WRONG_USERNAME_PASSWORD="WRONG_USERNAME_PASSWORD";
+	public static final String INCORRECT_OLD_PASSWORD = "INCORRECT_OLD_PASSWORD";
 }

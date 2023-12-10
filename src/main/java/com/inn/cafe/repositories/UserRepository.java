@@ -15,9 +15,10 @@ public interface UserRepository extends MongoRepository<User, Integer> {
 	@Query("{email:?0}")
 	public User findByEmailId(String email);
 	
-	@Query("{}")
+	@Query("{role:USER}")
 	public List<UserWrapper> getAllUser();
 
 	@Query("{role:ADMIN}")
 	public List<UserWrapper> getAllAdmin();
+	
 }

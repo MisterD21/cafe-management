@@ -64,4 +64,34 @@ public class UserRestController {
 		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@GetMapping("/checktoken")
+	public ResponseEntity<String> checkToken(){
+		try {
+			return userService.checkToken();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<String>(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping("/changepassword")
+	public ResponseEntity<String> changePassword(@RequestBody(required = true) Map<String, String> requestMap){
+		try {
+			return userService.changePassword(requestMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping("/forgetpassword")
+	public ResponseEntity<String> forgetPassword(@RequestBody(required = true) Map<String, String> requestMap){
+		try {
+			return userService.forgetPassword(requestMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }
