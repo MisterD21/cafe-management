@@ -1,6 +1,5 @@
 package com.inn.cafe.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Strings;
 import com.inn.cafe.constants.CafeConstants;
 import com.inn.cafe.entities.Category;
 import com.inn.cafe.jwt.JwtRequestFilter;
@@ -18,6 +16,7 @@ import com.inn.cafe.repositories.CategoryRepository;
 import com.inn.cafe.service.CategoryService;
 import com.inn.cafe.service.SequenceGeneratorService;
 import com.inn.cafe.util.CafeUtils;
+import com.inn.cafe.wrapper.CategoriesDto;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -81,17 +80,20 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public ResponseEntity<List<Category>> getAllCategory(String filterValue) {
+	public ResponseEntity<CategoriesDto> getAllCategory(String filterValue) {
+		CategoriesDto categoriesDto = new CategoriesDto();
 		try {
-			if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")) {
-				return new ResponseEntity<List<Category>>(categoryRepository.getAllCategory(), HttpStatus.OK);
-			}
-			return new ResponseEntity<List<Category>>(categoryRepository.findAll(), HttpStatus.OK);
+//			if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")) {
+				List<Category> allCategory = categoryRepository.getAllCategory();
+				categoriesDto.setCategories(allCategory);
+				return new ResponseEntity<CategoriesDto>(categoriesDto, HttpStatus.OK);
+//			}
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<CategoriesDto>(categoriesDto, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@Override
@@ -110,6 +112,27 @@ public class CategoryServiceImpl implements CategoryService {
 				}
 				return CafeUtils.getResponseEntity("category id doesnot exist", HttpStatus.BAD_REQUEST);
 
+			}else {
+				return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CafeUtils.getResponseEntity(CafeConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	@Override
+	public ResponseEntity<String> deleteCategory(Integer id) {
+		try {
+			if(jwtRequestFilter.isAdmin()) {
+				Optional<Category> categoryById = categoryRepository.findById(id);
+				if(!categoryById.isEmpty()) {
+					categoryRepository.delete(categoryById.get());
+					return CafeUtils.getResponseEntity("DATA DELETED SUCCESSFULLY", HttpStatus.OK);
+				}else {
+					return CafeUtils.getResponseEntity(CafeConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+				}
 			}else {
 				return CafeUtils.getResponseEntity(CafeConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
 			}
